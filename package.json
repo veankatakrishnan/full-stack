@@ -1,5 +1,5 @@
 {
-  "name": "practise",
+  "name": "vk-student-placement-system",
   "version": "1.0.1",
   "description": "",
   "main": "backend/server.js",
@@ -9,7 +9,7 @@
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "bin": {
-    "student-placement": "./bin/run.js"
+    "student-placement": "bin/run.js"
   },
   "keywords": [],
   "author": "",
