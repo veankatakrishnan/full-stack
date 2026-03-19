@@ -1,6 +1,8 @@
 import {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ViewStudent(){
+    const navigate = useNavigate();
         
     const [data, setData] = useState([]);
 
@@ -37,10 +39,11 @@ function ViewStudent(){
         }
     };
     return (
-        <div>
-
+        <div className="view-student-container">
+            <h2>View Students</h2>
             <input placeholder="Search" onChange={(e)=>search(e.target.value)} />
 
+            <div className="table-container">
             <table border="1">
             <thead>
                 <tr>
@@ -56,7 +59,8 @@ function ViewStudent(){
                     <td>{s.name}</td>
                     <td>{s.usn}</td>
                     <td>
-                    <button onClick={() => deleteStudent(s._id)}>Delete</button>
+                    <button onClick={() => navigate(`/edit/${s._id}`)}>Edit</button>
+                    <button onClick={() => deleteStudent(s._id)} style={{marginLeft: "10px"}}>Delete</button>
                     </td>
                 </tr>
                 ))}
@@ -64,6 +68,7 @@ function ViewStudent(){
             </tbody>
 
             </table>
+            </div>
 
         </div>
     );

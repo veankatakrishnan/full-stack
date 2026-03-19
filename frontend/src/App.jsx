@@ -3,6 +3,8 @@ import Navbar from "./components/Navbar.jsx";
 import Home from "./components/Home.jsx";
 import AddStudent from "./components/AddStudent.jsx";
 import ViewStudent from "./components/ViewStudent.jsx";
+import EditStudent from "./components/EditStudent.jsx";
+import './App.css'; // Ensure CSS is imported!
 
 function App(){
   return(
@@ -12,6 +14,7 @@ function App(){
             <Route path="/" element={<Home/>}/>
             <Route path="/view" element={<ViewStudent/>}/>
             <Route path="/add" element={<AddStudent/>}/>
+            <Route path="/edit/:id" element={<EditStudent/>}/>
         </Routes>
     </BrowserRouter>
   )

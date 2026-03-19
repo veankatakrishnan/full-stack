@@ -47,6 +47,16 @@ app.get('/students', async (req,res)=>{
     res.json(data);
 });
 
+// Fetch Single Student API for Edit
+app.get('/student/:id', async (req, res) => {
+    try {
+        const student = await Student.findById(req.params.id);
+        res.json(student);
+    } catch (err) {
+        res.status(500).json({ msg: "Error fetching student" });
+    }
+});
+
 //Searching Data
 app.get('/search',async (req, res)=>{
     const key = req.query.key;
@@ -59,7 +69,7 @@ app.get('/search',async (req, res)=>{
 
 //Update API
 app.put('/update/:id', async(req,res)=>{
-    await Student.findByIDAndUpdate(req.params.id, req.body);
+    await Student.findByIdAndUpdate(req.params.id, req.body);
     res.json({msg : "Updated"});
 })
 

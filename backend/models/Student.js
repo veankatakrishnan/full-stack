@@ -4,14 +4,14 @@ const studentSchema = new mongoose.Schema({
     name : String,
     usn : { type : String, unique : true},
     email : String,
-    phone : String, 
-    department : String, 
+    phone : String,
+    department : String,
     cgpa : String,
     skills : [String],
-    gender : String, 
+    gender : String,
     status : String,
-    gender : String, 
-    Company : String,
+    company : String,
+    roles : [String],
     placementDate : Date
 });
 

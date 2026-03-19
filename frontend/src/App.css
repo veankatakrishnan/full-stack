@@ -4,20 +4,83 @@ nav {
   padding: 10px;
 }
 
+h2 {
+  text-align: center;
+  margin-top: 20px;
+}
+
 form {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto; 
+  gap: 10px; 
 }
 
-input,
+input:not([type="radio"]):not([type="checkbox"]),
 select {
-  margin: 5px 0;
   padding: 8px;
+  width: 100%; 
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form span {
+  color: red;
+  font-size: 12px;
+  text-align: left;
+  margin-top: -5px; 
+}
+
+.view-student-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.view-student-container input {
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  width: 100%;
+  max-width: 800px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%; 
+  border-collapse: collapse;
+  margin: 0 auto; 
+}
+
+th, td {
+  padding: 10px 8px;
+  text-align: center; 
+  border: 1px solid #eee;
+}
+
+button {
+  padding: 6px 12px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #111111;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #3a3434;
 }
 
 @media (max-width: 600px) {
   table {
-    font-size: 12px;
+    font-size: 14px; 
   }
 }
