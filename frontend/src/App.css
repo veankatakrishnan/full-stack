@@ -1,0 +1,23 @@
+nav {
+  background: #333;
+  color: white;
+  padding: 10px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+input,
+select {
+  margin: 5px 0;
+  padding: 8px;
+}
+
+@media (max-width: 600px) {
+  table {
+    font-size: 12px;
+  }
+}
