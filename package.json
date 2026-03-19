@@ -1,6 +1,6 @@
 {
   "name": "vk-student-placement-system",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "backend/server.js",
   "scripts": {
