@@ -1,0 +1,264 @@
+1. Backend Boilerplate (server.js)
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// DB connection
+mongoose.connect("mongodb://127.0.0.1:27017/examDB")
+.then(()=>console.log("DB Connected"))
+.catch(err=>console.log(err));
+
+// Schema
+const studentSchema = new mongoose.Schema({
+  name: String,
+  usn: { type: String, unique: true },
+  email: String,
+  phone: String,
+  cgpa: Number,
+  status: String,
+  company: String
+});
+
+const Student = mongoose.model("Student", studentSchema);
+
+// CREATE
+app.post("/add", async(req,res)=>{
+  try{
+    const exist = await Student.findOne({usn:req.body.usn});
+    if(exist) return res.status(400).json({msg:"Duplicate USN"});
+
+    const data = new Student(req.body);
+    await data.save();
+    res.json(data);
+  }catch(err){
+    res.status(500).json(err);
+  }
+});
+
+// READ
+app.get("/all", async(req,res)=>{
+  const data = await Student.find();
+  res.json(data);
+});
+
+// SEARCH
+app.get("/search", async(req,res)=>{
+  const key = req.query.key;
+  const data = await Student.find({
+    name: { $regex: key, $options: "i" }
+  });
+  res.json(data);
+});
+
+// UPDATE
+app.put("/update/:id", async(req,res)=>{
+  await Student.findByIdAndUpdate(req.params.id, req.body);
+  res.json({msg:"Updated"});
+});
+
+// DELETE
+app.delete("/delete/:id", async(req,res)=>{
+  await Student.findByIdAndDelete(req.params.id);
+  res.json({msg:"Deleted"});
+});
+
+app.listen(5000, ()=>console.log("Server running"));
+2. Frontend Boilerplate
+App.jsx (Routing)
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AddStudent from "./AddStudent";
+import ViewStudent from "./ViewStudent";
+
+function App(){
+  return(
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AddStudent/>}/>
+        <Route path="/view" element={<ViewStudent/>}/>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+3. AddStudent.jsx (FORM + VALIDATION)
+import { useState } from "react";
+
+function AddStudent(){
+
+  const [form,setForm] = useState({
+    name:"", usn:"", email:"", phone:"",
+    cgpa:"", status:"", company:""
+  });
+
+  const [errors,setErrors] = useState({});
+
+  const handleChange = (e)=>{
+    setForm({...form,[e.target.name]:e.target.value});
+  };
+
+  const validate = ()=>{
+    let err={};
+
+    if(!form.name) err.name="Required";
+    if(!form.usn) err.usn="Required";
+    if(!form.email.includes("@")) err.email="Invalid";
+    if(form.phone.length!==10) err.phone="Invalid";
+    if(Number(form.cgpa)<6) err.cgpa="Not Eligible";
+
+    if(form.status==="Placed" && !form.company)
+      err.company="Required";
+
+    setErrors(err);
+    return Object.keys(err).length===0;
+  };
+
+  const handleSubmit = async(e)=>{
+    e.preventDefault();
+
+    if(!validate()) return;
+
+    await fetch("http://localhost:5000/add",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(form)
+    });
+
+    alert("Added");
+  };
+
+  return(
+    <form onSubmit={handleSubmit}>
+
+      <input name="name" placeholder="Name" onChange={handleChange}/>
+      <span>{errors.name}</span>
+
+      <input name="usn" placeholder="USN" onChange={handleChange}/>
+      <span>{errors.usn}</span>
+
+      <input name="email" placeholder="Email" onChange={handleChange}/>
+      <span>{errors.email}</span>
+
+      <input name="phone" placeholder="Phone" onChange={handleChange}/>
+      <span>{errors.phone}</span>
+
+      <input name="cgpa" placeholder="CGPA" onChange={handleChange}/>
+      <span>{errors.cgpa}</span>
+
+      <select name="status" onChange={handleChange}>
+        <option value="">Status</option>
+        <option value="Placed">Placed</option>
+        <option value="NotPlaced">Not Placed</option>
+      </select>
+
+      {form.status==="Placed" && (
+        <input name="company" placeholder="Company" onChange={handleChange}/>
+      )}
+      <span>{errors.company}</span>
+
+      <button type="submit">Submit</button>
+
+    </form>
+  );
+}
+
+export default AddStudent;
+4. ViewStudent.jsx (READ + SEARCH + DELETE + UPDATE)
+import { useState,useEffect } from "react";
+
+function ViewStudent(){
+
+  const [data,setData] = useState([]);
+  const [edit,setEdit] = useState(null);
+
+  useEffect(()=>{
+    fetchData();
+  },[]);
+
+  const fetchData = async()=>{
+    const res = await fetch("http://localhost:5000/all");
+    const result = await res.json();
+    setData(result);
+  };
+
+  const deleteStudent = async(id)=>{
+    await fetch(`http://localhost:5000/delete/${id}`,{
+      method:"DELETE"
+    });
+    fetchData();
+  };
+
+  const search = async(key)=>{
+    const res = await fetch(`http://localhost:5000/search?key=${key}`);
+    const result = await res.json();
+    setData(result);
+  };
+
+  const updateStudent = async(e)=>{
+    e.preventDefault();
+
+    await fetch(`http://localhost:5000/update/${edit._id}`,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(edit)
+    });
+
+    setEdit(null);
+    fetchData();
+  };
+
+  return(
+    <div>
+
+      <input placeholder="Search" onChange={(e)=>search(e.target.value)}/>
+
+      <table border="1">
+        <tbody>
+          {data.map(s=>(
+            <tr key={s._id}>
+              <td>{s.name}</td>
+              <td>{s.usn}</td>
+
+              <td>
+                <button onClick={()=>deleteStudent(s._id)}>Delete</button>
+                <button onClick={()=>setEdit(s)}>Edit</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {edit && (
+        <form onSubmit={updateStudent}>
+          <input
+            value={edit.name}
+            onChange={(e)=>setEdit({...edit,name:e.target.value})}
+          />
+          <button type="submit">Update</button>
+        </form>
+      )}
+
+    </div>
+  );
+}
+
+export default ViewStudent;
+5. CSS (Minimal Responsive)
+form{
+  display:flex;
+  flex-direction:column;
+  width:300px;
+}
+
+input,select{
+  margin:5px;
+  padding:8px;
+}
+
+@media(max-width:600px){
+  form{ width:100%; }
+}
